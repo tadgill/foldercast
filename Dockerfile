@@ -5,9 +5,11 @@ FROM python:3.14
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Install curl for background loop
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Set work directory to be /app inside docker container
 WORKDIR /app
-
 
 # Install dependencies
 RUN mkdir requirements

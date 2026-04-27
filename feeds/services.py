@@ -130,7 +130,7 @@ class FeedGeneratorService:
             href=f"http://{self.request_host}/{settings.LIBRARY_URL}{quote(self.directory.name)}/feed.rss",
             rel="self",
         )
-		fg.ttl(60)
+        fg.ttl(60)
     def add_episodes(self):
         if not self.audio_files:
             logger.warning(f"No files found in folder: {self.directory.name}")

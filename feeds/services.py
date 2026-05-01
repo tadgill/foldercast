@@ -109,8 +109,7 @@ class FeedItem:
             ),
             length=str(file.stat().st_size),
         )
-
-class FeedGeneratorService:
+        class FeedGeneratorService:
     """
     Generate an RSS feed from a directory of audio files.
     Returns feed's metadata.
@@ -137,7 +136,8 @@ class FeedGeneratorService:
             rel="self",
         )
         fg.ttl(60)
-def add_episodes(self):
+
+    def add_episodes(self):
         if not self.audio_files:
             logger.warning(f"No files found in folder: {self.directory.name}")
             return
@@ -183,6 +183,7 @@ def add_episodes(self):
                 feed_generator=self.feedgen,
                 fake_timestamp=fake_time
             )
+
     def write_feed(self):
         rss_file = Path(
             settings.LIBRARY_ROOT,

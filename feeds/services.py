@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 def has_audio_files(directory):
-    # .rglob('*') looks through all subfolders recursively
     for file in directory.rglob('*'):
         if (
             file.is_file()
@@ -27,7 +26,6 @@ def has_audio_files(directory):
     return False
 
 def get_audio_files(directory):
-    # Changed to .rglob('*') to find files in nested folders
     audio_files = [
         f
         for f in Path(directory).rglob('*')
@@ -37,7 +35,6 @@ def get_audio_files(directory):
 
 def scan_library_for_subdirs():
     root = Path(settings.LIBRARY_ROOT)
-    # This keeps the "Top Level" folders as the primary feeds in your dashboard
     dirs = [d for d in root.iterdir() if d.is_dir() and has_audio_files(d)]
     return dirs
 
@@ -80,13 +77,8 @@ class FeedItem:
         self.creation_timestamp = fake_timestamp if fake_timestamp else real_time
         self.episode = feed_generator.add_entry()
 
-        # ... (the rest of your FeedItem logic stays exactly the same)
-
-        # Logic to append folder names to the title for recursive files
-        # It calculates the path relative to the main feed folder
         relative_path = file.relative_to(Path(settings.LIBRARY_ROOT) / dir_name)
         if len(relative_path.parts) > 1:
-            # Result: "Subfolder - File"
             display_title = " - ".join(list(relative_path.parent.parts) + [file.stem])
         else:
             display_title = file.stem
@@ -100,7 +92,6 @@ class FeedItem:
         )
         self.episode.pubDate(get_timezone_aware_datetime(self.creation_timestamp))
         
-        # URL construction remains the same to ensure Nginx can find the file
         file_url_path = quote(str(relative_path))
         self.episode.enclosure(
             url=f"http://{request_host}/{settings.LIBRARY_URL}{quote(dir_name)}/{file_url_path}",
@@ -109,7 +100,9 @@ class FeedItem:
             ),
             length=str(file.stat().st_size),
         )
-        class FeedGeneratorService:
+
+
+class FeedGeneratorService:
     """
     Generate an RSS feed from a directory of audio files.
     Returns feed's metadata.

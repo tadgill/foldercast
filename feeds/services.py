@@ -73,7 +73,7 @@ def get_artwork_url(request_host, directory, title_text):
 
 class FeedItem:
     def __init__(self, request_host, dir_name, file, feed_generator):
-        self.creation_timestamp = file.stat().st_ctime
+        self.creation_timestamp = file.stat().st_mtime
         self.episode = feed_generator.add_entry()
 
         # Logic to append folder names to the title for recursive files

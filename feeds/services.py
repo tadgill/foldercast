@@ -72,9 +72,15 @@ def get_artwork_url(request_host, directory, title_text):
 
 
 class FeedItem:
-    def __init__(self, request_host, dir_name, file, feed_generator):
-        self.creation_timestamp = file.stat().st_mtime
+    def __init__(self, request_host, dir_name, file, feed_generator, fake_timestamp=None):
+        stat = file.stat()
+        # Try to get Mac's true creation date, fallback to modified time
+        real_time = getattr(stat, 'st_birthtime', stat.st_mtime)
+        
+        self.creation_timestamp = fake_timestamp if fake_timestamp else real_time
         self.episode = feed_generator.add_entry()
+
+        # ... (the rest of your FeedItem logic stays exactly the same)
 
         # Logic to append folder names to the title for recursive files
         # It calculates the path relative to the main feed folder

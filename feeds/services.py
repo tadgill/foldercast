@@ -137,19 +137,52 @@ class FeedGeneratorService:
             rel="self",
         )
         fg.ttl(60)
-    def add_episodes(self):
+def add_episodes(self):
         if not self.audio_files:
             logger.warning(f"No files found in folder: {self.directory.name}")
             return
 
-        for file in self.audio_files:
+        # Safely look up the feed in the database to get its specific sorting preference
+        sort_preference = 'date' 
+        try:
+            feed = Feed.objects.get(name=self.directory.name) 
+            sort_preference = feed.sort_order
+        except Feed.DoesNotExist:
+            pass
+
+        # Apply the specific feed's sorting preference
+        if sort_preference == 'name':
+            self.audio_files.sort(key=lambda x: str(x).lower())
+        else:
+            # Sort by true creation date first, then fallback to alphabetical file name
+            self.audio_files.sort(key=lambda x: (getattr(x.stat(), 'st_birthtime', x.stat().st_mtime), str(x).lower()))
+
+        base_time = timezone.now().timestamp()
+        previous_time = None
+        offset = 0
+
+        for index, file in enumerate(self.audio_files):
+            if sort_preference == 'name':
+                fake_time = base_time + index
+            else:
+                real_time = getattr(file.stat(), 'st_birthtime', file.stat().st_mtime)
+                
+                # If this file has the exact same time as the previous one, bump it by 1 second
+                if real_time == previous_time:
+                    offset += 1
+                else:
+                    offset = 0 
+                    previous_time = real_time
+                
+                fake_time = real_time + offset
+            
             FeedItem(
                 request_host=self.request_host,
                 dir_name=self.directory.name,
                 file=file,
                 feed_generator=self.feedgen,
+                fake_timestamp=fake_time
             )
-
     def write_feed(self):
         rss_file = Path(
             settings.LIBRARY_ROOT,

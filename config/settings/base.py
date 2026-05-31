@@ -181,3 +181,5 @@ AUDIO_MIME_TYPES = {
     "mp4": "video/mp4", "mkv": "video/x-matroska", "avi": "video/x-msvideo",
     "mov": "video/quicktime", "wmv": "video/x-ms-wmv", "flv": "video/x-flv", "m4v": "video/x-m4v"
 }
+
+FEED_DOMAIN = env.str("FEED_DOMAIN", default=None)

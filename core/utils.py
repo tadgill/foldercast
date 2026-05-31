@@ -9,4 +9,6 @@ def get_timezone_aware_datetime(timestamp):
     return tz_aware_datetime
 
 def build_host(request):
+    if getattr(settings, 'FEED_DOMAIN', None):
+        return settings.FEED_DOMAIN
     return request.get_host()
